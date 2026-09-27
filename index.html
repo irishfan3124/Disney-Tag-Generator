@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stroller Tag Generator</title>
+    <meta name="description" content="Design a personalised 3D-printable Mickey-ear stroller tag and download it as a multi-colour 3MF or STL." />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='38' r='20' fill='%23F95D73'/%3E%3Ccircle cx='14' cy='16' r='12' fill='%23F95D73'/%3E%3Ccircle cx='50' cy='16' r='12' fill='%23F95D73'/%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <div class="app">
+      <aside class="panel">
+        <header class="brand">
+          <h1>Stroller Tag Generator</h1>
+          <p>Type your family name, tweak the look, and download a file ready for your 3D printer.</p>
+        </header>
+
+        <form id="controls" autocomplete="off">
+          <details class="group" open>
+            <summary>Text</summary>
+            <label class="field">
+              <span>Family name</span>
+              <input name="name" type="text" maxlength="24" />
+            </label>
+            <div class="row">
+              <label class="field">
+                <span>Line above</span>
+                <input name="topText" type="text" maxlength="20" />
+              </label>
+              <label class="field">
+                <span>Line below</span>
+                <input name="bottomText" type="text" maxlength="24" />
+              </label>
+            </div>
+            <label class="check"><input name="uppercase" type="checkbox" /> All capitals for the name</label>
+          </details>
+
+          <details class="group" open>
+            <summary>Fonts</summary>
+            <label class="field">
+              <span>Name font</span>
+              <div class="with-button">
+                <select name="nameFont" data-fonts></select>
+                <label class="button small" title="Use your own .ttf, .otf or .woff font">
+                  Upload<input type="file" accept=".ttf,.otf,.woff" data-font-upload="nameFont" hidden />
+                </label>
+              </div>
+            </label>
+            <label class="field">
+              <span>Script font (line above and below)</span>
+              <div class="with-button">
+                <select name="scriptFont" data-fonts></select>
+                <label class="button small" title="Use your own .ttf, .otf or .woff font">
+                  Upload<input type="file" accept=".ttf,.otf,.woff" data-font-upload="scriptFont" hidden />
+                </label>
+              </div>
+            </label>
+            <p class="hint">Have a Disney-style font like Waltograph? Upload it to use it here. Nothing leaves your computer.</p>
+          </details>
+
+          <details class="group" open>
+            <summary>Size</summary>
+            <label class="field range">
+              <span>Width <output data-for="width"></output></span>
+              <input name="width" type="range" min="120" max="400" step="0.1" />
+            </label>
+            <p class="hint" id="sizeReadout"></p>
+            <label class="field range">
+              <span>Base thickness <output data-for="baseThickness"></output></span>
+              <input name="baseThickness" type="range" min="1.2" max="10" step="0.05" />
+            </label>
+            <label class="field range">
+              <span>Tile height <output data-for="tileThickness"></output></span>
+              <input name="tileThickness" type="range" min="0.4" max="6" step="0.05" />
+            </label>
+            <label class="field range">
+              <span>Letter height <output data-for="letterThickness"></output></span>
+              <input name="letterThickness" type="range" min="0.4" max="6" step="0.05" />
+            </label>
+            <label class="field range">
+              <span>Script text height <output data-for="scriptThickness"></output></span>
+              <input name="scriptThickness" type="range" min="0.4" max="6" step="0.05" />
+            </label>
+          </details>
+
+          <details class="group">
+            <summary>Name style</summary>
+            <label class="field">
+              <span>Style</span>
+              <select name="tileStyle">
+                <option value="alternating">Tiles, alternating sizes (original)</option>
+                <option value="uniform">Tiles, all the same size</option>
+                <option value="sticker">Outlined letters</option>
+                <option value="none">Letters only</option>
+              </select>
+            </label>
+            <label class="field range">
+              <span>Name size <output data-for="nameScale"></output></span>
+              <input name="nameScale" type="range" min="0.5" max="1.3" step="0.01" />
+            </label>
+            <label class="field range">
+              <span>Letter size in tile <output data-for="letterFill"></output></span>
+              <input name="letterFill" type="range" min="0.5" max="0.95" step="0.01" />
+            </label>
+            <label class="field range" data-show="tiles">
+              <span>Tile corner radius <output data-for="tileRadius"></output></span>
+              <input name="tileRadius" type="range" min="0" max="8" step="0.1" />
+            </label>
+            <label class="field range" data-show="sticker">
+              <span>Outline width <output data-for="stickerWidth"></output></span>
+              <input name="stickerWidth" type="range" min="1" max="6" step="0.1" />
+            </label>
+            <label class="field range">
+              <span>Letter tilt <output data-for="tilt"></output></span>
+              <input name="tilt" type="range" min="0" max="15" step="0.5" />
+            </label>
+            <label class="field range">
+              <span>Letter bounce <output data-for="bounce"></output></span>
+              <input name="bounce" type="range" min="0" max="1" step="0.05" />
+            </label>
+            <label class="field range">
+              <span>Letter boldness <output data-for="letterBold"></output></span>
+              <input name="letterBold" type="range" min="-0.6" max="1.5" step="0.05" />
+            </label>
+            <label class="field range">
+              <span>Script size <output data-for="scriptScale"></output></span>
+              <input name="scriptScale" type="range" min="0.5" max="1.3" step="0.01" />
+            </label>
+            <label class="field range">
+              <span>Script boldness <output data-for="scriptBold"></output></span>
+              <input name="scriptBold" type="range" min="-0.4" max="1.5" step="0.05" />
+            </label>
+          </details>
+
+          <details class="group" open>
+            <summary>Cutouts</summary>
+            <div class="pattern-picker" id="patternPicker" role="radiogroup" aria-label="Cutout pattern"></div>
+            <label class="button small upload-pattern">
+              Upload SVG shape<input type="file" accept=".svg,image/svg+xml" id="svgUpload" hidden />
+            </label>
+            <label class="field">
+              <span>Layout</span>
+              <select name="layout"></select>
+            </label>
+            <label class="field range">
+              <span>Cutout size <output data-for="patternScale"></output></span>
+              <input name="patternScale" type="range" min="0.4" max="1.6" step="0.01" />
+            </label>
+            <label class="field range">
+              <span>Rotation <output data-for="patternRotation"></output></span>
+              <input name="patternRotation" type="range" min="-180" max="180" step="1" />
+            </label>
+            <label class="check"><input name="mirrorPattern" type="checkbox" /> Mirror on the left ear</label>
+            <label class="check"><input name="slots" type="checkbox" /> Strap slots</label>
+            <label class="field range" data-show="slots">
+              <span>Slot length <output data-for="slotScale"></output></span>
+              <input name="slotScale" type="range" min="0.5" max="1.5" step="0.01" />
+            </label>
+          </details>
+
+          <details class="group">
+            <summary>Colours</summary>
+            <p class="hint">Pick a filament colour for each slot, then choose which slot prints each part. These carry over into the 3MF.</p>
+            <div class="swatches" id="swatches"></div>
+            <div class="assign" id="assign"></div>
+          </details>
+
+          <details class="group">
+            <summary>Printer</summary>
+            <label class="field">
+              <span>Bed size</span>
+              <select name="bed">
+                <option value="180">180 mm (Bambu A1 mini)</option>
+                <option value="220">220 mm (Ender 3, Prusa MK4)</option>
+                <option value="256">256 mm (Bambu X1, P1, A1)</option>
+                <option value="300">300 mm</option>
+                <option value="350">350 mm</option>
+              </select>
+            </label>
+            <p class="hint" id="bedReadout"></p>
+          </details>
+        </form>
+
+        <footer class="panel-foot">
+          <button type="button" class="link" id="reset">Reset to original</button>
+          <button type="button" class="link" id="share">Copy share link</button>
+        </footer>
+      </aside>
+
+      <main class="stage">
+        <div class="viewer" id="viewer">
+          <div class="view-buttons">
+            <button type="button" data-view="angle" class="active">3D</button>
+            <button type="button" data-view="top">Top</button>
+          </div>
+          <div class="status" id="status" aria-live="polite"></div>
+        </div>
+        <div class="downloads">
+          <div class="dims" id="dims"></div>
+          <div class="download-buttons">
+            <button type="button" class="button primary" id="dl3mf" title="Multi-colour project for Bambu Studio and OrcaSlicer">Download 3MF</button>
+            <button type="button" class="button" id="dlZip" title="One STL per filament colour, for any slicer">STLs by colour</button>
+            <button type="button" class="button" id="dlStl" title="Everything in one STL, for single-colour prints">Single STL</button>
+          </div>
+        </div>
+      </main>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
