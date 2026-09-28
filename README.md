@@ -59,5 +59,7 @@ Everything runs in the browser. There's no server and no uploads.
 | `src/fonts.js` | Bundled font list and custom font loading |
 | `src/main.js` | UI, 3D preview (three.js), share links, and downloads |
 | `scripts/*.mjs` | Node checks: `node scripts/smoke.mjs` and `node scripts/export-test.mjs out.3mf` |
+| `pmm/` | Notes and preview for the MakerWorld Parametric Model Maker version (see [pmm/README.md](pmm/README.md)). The `.scad` script itself is kept out of this public repo. |
+| `examples/` | Example renders, mockup photos, real print photos, and ready-to-print 3MFs for five designs (`node scripts/export-variants.mjs`) |
 
 Fonts are from Google Fonts via @fontsource and are licensed under the SIL Open Font License.

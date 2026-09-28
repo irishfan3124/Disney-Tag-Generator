@@ -1,4 +1,8 @@
 import JSZip from 'jszip';
+// Complete Bambu Studio project settings (Bambu Lab P2S, 0.20 mm Standard, Bambu PLA
+// Basic), exported by MakerWorld. Bambu Studio ignores a project file that is only a
+// partial settings list, so every export starts from this full set.
+import BAMBU_SETTINGS from './bambu-project-settings.json' with { type: 'json' };
 
 // meshes: [{ name, slot, positions, indices }] in millimetres, centred on the origin.
 
@@ -74,7 +78,18 @@ export async function bambu3mf(meshes, { title, colors, bed, rotation, thumbnail
   const identity = '1 0 0 0 1 0 0 0 1 0 0 0';
   const a = (rotation * Math.PI) / 180;
   const c = Math.cos(a), s = Math.sin(a);
-  const place = `${num(c)} ${num(s)} 0 ${num(-s)} ${num(c)} 0 0 0 1 ${num(bed / 2)} ${num(bed / 2)} 0`;
+  // The tag isn't symmetric top to bottom, so once it's turned its footprint is off
+  // centre. Centre the turned footprint (not the origin) on the plate.
+  let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+  for (const { positions: p } of meshes) {
+    for (let i = 0; i < p.length; i += 3) {
+      const x = p[i] * c - p[i + 1] * s, y = p[i] * s + p[i + 1] * c;
+      if (x < x0) x0 = x; if (x > x1) x1 = x;
+      if (y < y0) y0 = y; if (y > y1) y1 = y;
+    }
+  }
+  const tx = bed / 2 - (x0 + x1) / 2, ty = bed / 2 - (y0 + y1) / 2;
+  const place = `${num(c)} ${num(s)} 0 ${num(-s)} ${num(c)} 0 0 0 1 ${num(tx)} ${num(ty)} 0`;
 
   zip.file(
     '[Content_Types].xml',
@@ -120,7 +135,7 @@ ${meshes.map((m, i) => meshXml(i + 1, m)).join('')} </resources>
     '3D/3dmodel.model',
     `<?xml version="1.0" encoding="UTF-8"?>
 <model unit="millimeter" xml:lang="en-US" ${NS}>
- <metadata name="Application">BambuStudio-02.00.00.00</metadata>
+ <metadata name="Application">BambuStudio-${BAMBU_SETTINGS.version}</metadata>
  <metadata name="BambuStudio:3mfVersion">1</metadata>
  <metadata name="Title">${esc(title)}</metadata>
  <metadata name="Designer">Stroller Tag Generator</metadata>
@@ -172,14 +187,25 @@ ${meshes
 </config>`,
   );
   const used = Math.max(...meshes.map((m) => m.slot));
-  zip.file(
-    'Metadata/project_settings.config',
-    JSON.stringify({ filament_colour: colors.slice(0, used) }, null, 4),
-  );
+  zip.file('Metadata/project_settings.config', JSON.stringify(projectSettings(colors.slice(0, used)), null, 4));
   if (thumbnail) zip.file('Metadata/plate_1.png', thumbnail);
   return zip.generateAsync({
     type: 'blob',
     compression: 'DEFLATE',
     mimeType: 'application/vnd.ms-package.3dmanufacturing-3dmodel+xml',
   });
+}
+
+// Per-filament settings are arrays with one entry per filament. Resize them all to the
+// number of filaments this tag uses and drop in its colours.
+function projectSettings(colors) {
+  const n = BAMBU_SETTINGS.filament_colour.length;
+  const settings = {};
+  for (const [key, value] of Object.entries(BAMBU_SETTINGS)) {
+    settings[key] = Array.isArray(value) && value.length === n
+      ? colors.map((_, i) => value[Math.min(i, n - 1)])
+      : value;
+  }
+  settings.filament_colour = colors.map((c) => c.toUpperCase() + 'FF');
+  return settings;
 }

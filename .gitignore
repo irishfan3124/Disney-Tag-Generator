@@ -1,2 +1,5 @@
 node_modules
 dist
+
+# MakerWorld Parametric Model Maker script: published there with source kept private
+pmm/stroller-tag.scad
